@@ -4,6 +4,11 @@ from flask import Flask, jsonify
 import joblib
 import pandas as pd
 import os
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+from datetime import datetime
+from threading import Thread
 
 app = Flask(__name__)
 
@@ -114,14 +119,11 @@ def predict_budget(data):
 def run_flask():
     app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
 
+
+
 # ---------------------- Streamlit App Section ----------------------
 
-import streamlit as st
-import pandas as pd
-import os
-import plotly.express as px
-from datetime import datetime
-from threading import Thread
+
 
 # Function to save new transaction to a CSV file
 def save_transaction(doc_type, doc_number, department, amount, predicted_category, is_fraud=False):
