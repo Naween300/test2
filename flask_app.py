@@ -1,8 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 import joblib
 import pandas as pd
 import smtplib
-from email.mime.text import MIMEText
+from email.mime.text import
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 import os
@@ -76,10 +76,8 @@ def send_fraud_alert(transaction_details, metadata=None):
     except Exception as e:
         print(f"Failed to send fraud alert email: {str(e)}")
 
-@app.route('/categorize', methods=['POST'])
-def categorize():
+def categorize(data):
     try:
-        data = request.json
         print(f"Received data: {data}")  # Debugging line
 
         if not data or 'Doc Type' not in data or 'Department' not in data or 'Amount' not in data:
@@ -164,16 +162,15 @@ def categorize():
         else:
             new_transaction.to_csv(transactions_file, mode='w', header=True, index=False)
 
-        return jsonify({
+        return {
             'predicted_category': predicted_category_label,
             'is_fraud': is_fraud
-        })
+        }
 
     except Exception as e:
         print(f"Error in /categorize: {str(e)}")
         return str(e), 500
 
-@app.route('/predict_expense', methods=['GET'])
 def predict_expense():
     try:
         # Use the precomputed predictions instead of recalculating them
@@ -186,17 +183,14 @@ def predict_expense():
         }
 
         # Return the predicted expenses
-        return jsonify(predictions)
+        return predictions
 
     except Exception as e:
         print(f"Error in /predict_expense: {str(e)}")
         return str(e), 500
 
-@app.route('/predict_budget', methods=['POST'])
-def predict_budget():
+def predict_budget(data):
     try:
-        data = request.json
-
         year = data['year']
         month = data['month']
 
@@ -219,11 +213,11 @@ def predict_budget():
             # Convert the prediction to a standard Python float
             predictions[category] = float(prediction)
 
-        return jsonify({
+        return {
             'year': year,
             'month': month,
             'predicted_budgets': predictions
-        })
+        }
 
     except Exception as e:
         print(f"Error in /predict_budget: {str(e)}")
