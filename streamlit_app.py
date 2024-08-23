@@ -218,7 +218,7 @@ def run_streamlit():
         else:
             st.error(f"Error: {predictions}")
 
-       elif page == "Monthly Budget Allocation":
+        elif page == "Monthly Budget Allocation":
         st.header('Monthly Budget Allocation')
 
         # Select year and month
@@ -316,7 +316,6 @@ def run_streamlit():
                 st.error("Error reading the CSV file. Please check its structure.")
                 st.error(str(e)) 
         else:
-            st.warning("No fraudulent transactions found.")
             st.warning("No fraudulent transactions found.")
 
 # ---------------------- Execution Section ----------------------
