@@ -1,9 +1,9 @@
 import streamlit as st
-import requests
 import pandas as pd
 import os
 import plotly.express as px
 from datetime import datetime
+from flask_code import categorize, predict_expense, predict_budget  # Import functions from Flask code
 
 # Function to save new transaction to a CSV file
 def save_transaction(doc_type, doc_number, department, amount, predicted_category, is_fraud=False):
@@ -36,7 +36,7 @@ def save_transaction(doc_type, doc_number, department, amount, predicted_categor
     except Exception as e:
         st.error(f"Failed to save the transaction: {str(e)}")
 
-st.title('💼 Expense Management & Frud detection')
+st.title('💼 Expense Management & Fraud Detection')
 
 # Page navigation
 page = st.sidebar.selectbox("Choose a page", ["Add New Transaction", "Predicted Expenses for Next Month", "Monthly Budget Allocation", "View Live Data", "View Fraudulent Transactions"])
@@ -53,11 +53,9 @@ if page == "Add New Transaction":
     if st.button('Add Transaction'):
         if amount:
             try:
-                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                # Convert amount to float
                 amount = float(amount)
                 
-                # Prepare the data to send to the Flask API
+                # Prepare the data for categorization and fraud detection
                 new_transaction = {
                     'Doc Type': doc_type,
                     'Document Number': doc_number,
@@ -65,10 +63,9 @@ if page == "Add New Transaction":
                     'Amount': amount
                 }
 
-                # Send the data to the Flask API for categorization and fraud detection
-                response = requests.post('http://127.0.0.1:5000/categorize', json=new_transaction)
-                if response.status_code == 200:
-                    result = response.json()
+                # Directly call the Flask function instead of making a request
+                result = categorize(new_transaction)
+                if isinstance(result, dict):
                     predicted_category = result['predicted_category']
                     is_fraud = result.get('is_fraud', False)
 
@@ -83,9 +80,8 @@ if page == "Add New Transaction":
                         st.warning("Warning: This transaction might be fraudulent!")
                     else:
                         st.success("This transaction is not fraudulent.")
-
                 else:
-                    st.error(f"Error: {response.text}")
+                    st.error(f"Error: {result}")
             except ValueError:
                 st.error("Please enter a valid amount.")
         else:
@@ -94,11 +90,9 @@ if page == "Add New Transaction":
 elif page == "Predicted Expenses for Next Month":
     st.header('Predicted Expenses for Next Month')
 
-    # Fetch the predictions from the Flask API
-    response = requests.get('http://127.0.0.1:5000/predict_expense')
-    if response.status_code == 200:
-        predictions = response.json()
-
+    # Directly call the Flask function instead of making a request
+    predictions = predict_expense()
+    if isinstance(predictions, dict):
         # Convert predictions to a DataFrame for easier manipulation
         predictions_df = pd.DataFrame(list(predictions.items()), columns=['Category', 'Predicted Expense'])
 
@@ -112,9 +106,8 @@ elif page == "Predicted Expenses for Next Month":
 
         # Display the Plotly figure
         st.plotly_chart(fig)
-
     else:
-        st.error(f"Error: {response.text}")
+        st.error(f"Error: {predictions}")
 
 elif page == "Monthly Budget Allocation":
     st.header('Monthly Budget Allocation')
@@ -128,14 +121,12 @@ elif page == "Monthly Budget Allocation":
                                'July', 'August', 'September', 'October', 'November', 'December'].index(month_name)]
 
     if st.button('Get Budget Allocation'):
-        # Send a request to the Flask API
-        response = requests.post(
-            'http://127.0.0.1:5000/predict_budget',
-            json={'year': year, 'month': month}
-        )
+        # Prepare the data for budget prediction
+        data = {'year': year, 'month': month}
 
-        if response.status_code == 200:
-            result = response.json()
+        # Directly call the Flask function instead of making a request
+        result = predict_budget(data)
+        if isinstance(result, dict):
             predicted_budgets = result['predicted_budgets']
             
             st.subheader(f"Predicted Budget for {month_name} {year}:")
@@ -148,7 +139,7 @@ elif page == "Monthly Budget Allocation":
                          labels={'Budget': 'Predicted Budget (LKR)', 'Category': 'Category'}, color='Category', height=400)
             st.plotly_chart(fig)
         else:
-            st.error('Error fetching the budget prediction. Please try again.')
+            st.error(f"Error: {result}")
 
 elif page == "View Live Data":
     st.header('View Live Data')
