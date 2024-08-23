@@ -218,10 +218,11 @@ def run_streamlit():
         else:
             st.error(f"Error: {predictions}")
 
-    elif page == "Monthly Budget Allocation":
+       elif page == "Monthly Budget Allocation":
         st.header('Monthly Budget Allocation')
 
-               year = st.selectbox('Select Year', list(range(2023, 2030)))
+        # Select year and month
+        year = st.selectbox('Select Year', list(range(2023, 2030)))
         month_name = st.selectbox('Select Month', 
                                   ['January', 'February', 'March', 'April', 'May', 'June', 
                                    'July', 'August', 'September', 'October', 'November', 'December'])
@@ -315,6 +316,7 @@ def run_streamlit():
                 st.error("Error reading the CSV file. Please check its structure.")
                 st.error(str(e)) 
         else:
+            st.warning("No fraudulent transactions found.")
             st.warning("No fraudulent transactions found.")
 
 # ---------------------- Execution Section ----------------------
