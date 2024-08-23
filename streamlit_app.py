@@ -1,13 +1,9 @@
-import streamlit as st
-import pandas as pd
-import os
-import plotly.express as px
-from datetime import datetime
+# ---------------------- Flask App Section ----------------------
+
 from flask import Flask, jsonify
 import joblib
-from threading import Thread
-
-# ---------------------- Flask App Section ----------------------
+import pandas as pd
+import os
 
 app = Flask(__name__)
 
@@ -120,6 +116,13 @@ def run_flask():
 
 # ---------------------- Streamlit App Section ----------------------
 
+import streamlit as st
+import pandas as pd
+import os
+import plotly.express as px
+from datetime import datetime
+from threading import Thread
+
 # Function to save new transaction to a CSV file
 def save_transaction(doc_type, doc_number, department, amount, predicted_category, is_fraud=False):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -218,7 +221,7 @@ def run_streamlit():
         else:
             st.error(f"Error: {predictions}")
 
-        elif page == "Monthly Budget Allocation":
+    elif page == "Monthly Budget Allocation":
         st.header('Monthly Budget Allocation')
 
         # Select year and month
